@@ -1,12 +1,19 @@
 {
-    "manifest_version": 1,
-    "name": "CloneElement-InstantCSS",
-    "version": "1.0",
-    "description": "Clone an element",
-    "content_scripts": [
-        {
-            "matches": ["*://*/*"],
-            "js": ["scrape.js"]
-        }
-    ]
+  "manifest_version": 3,
+  "name": "CloneElement-InstantCSS",
+  "version": "3.0",
+  "description": "Clone an element",
+  "permissions": [
+    "activeTab",
+    "downloads"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["scrape.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
 }
