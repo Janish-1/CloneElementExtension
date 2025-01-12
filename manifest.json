@@ -1,0 +1,12 @@
+{
+    "manifest_version": 1,
+    "name": "CloneElement-InstantCSS",
+    "version": "1.0",
+    "description": "Clone an element",
+    "content_scripts": [
+        {
+            "matches": ["*://*/*"],
+            "js": ["scrape.js"]
+        }
+    ]
+}
