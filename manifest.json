@@ -1,19 +1,22 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "CloneElement-InstantCSS",
-  "version": "3.0",
+  "version": "4.0",
   "description": "Clone a Webpage Elements and Instantly Apply CSS",
-  "permissions": [
-    "activeTab",
-    "downloads"
-  ],
+  "permissions": ["activeTab", "downloads"],
+  "host_permissions": ["*://*/*"],
   "content_scripts": [
     {
       "matches": ["*://*/*"],
       "js": ["scrape.js"]
     }
   ],
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{a3888e96-18e6-46cc-9f61-9ad880cdea89}"
+    }
   }
 }
