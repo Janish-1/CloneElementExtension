@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "CloneElement-InstantCSS",
-  "version": "2.0",
+  "version": "3.0",
   "description": "Clone a Webpage Elements and Instantly Apply CSS",
   "permissions": [
     "activeTab",
@@ -13,7 +13,7 @@
       "js": ["scrape.js"]
     }
   ],
-  "action": {
+  "browser_action": {
     "default_popup": "popup.html"
   }
 }
