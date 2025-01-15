@@ -1,127 +1,78 @@
-console.log("scrape.js is running");
+const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
-// Function to download a file
-function downloadFile(filename, content, type = "text/plain") {
-    const blob = new Blob([content], { type });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-}
+extensionAPI.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "downloadHTML") {
+        const htmlContent = document.documentElement.outerHTML;
+        sendResponse({ content: htmlContent });
+    } else if (request.action === "downloadCSS") {
+        getAllCSS().then((cssContent) => sendResponse({ content: cssContent }));
+        return true; // Keep the channel open for async response
+    } else if (request.action === "downloadJS") {
+        getAllJS().then((jsContent) => sendResponse({ content: jsContent }));
+        return true; // Keep the channel open for async response
+    } else if (request.action === "downloadImages") {
+        getImages().then((images) => sendResponse({ images })); // Return image data
+        return true; // Keep the channel open for async response
+    }
+});
 
 // Function to get all CSS rules
-function getAllCSS() {
+async function getAllCSS() {
     let cssContent = "";
-
-    Array.from(document.styleSheets).forEach((stylesheet) => {
+    for (const stylesheet of Array.from(document.styleSheets)) {
         try {
-            Array.from(stylesheet.cssRules || []).forEach((rule) => {
-                cssContent += `${rule.cssText}\n`;
-            });
+            if (stylesheet.href) {
+                const response = await fetch(stylesheet.href);
+                const text = await response.text();
+                cssContent += `/* Source: ${stylesheet.href} */\n${text}\n`;
+            } else {
+                Array.from(stylesheet.cssRules || []).forEach((rule) => {
+                    cssContent += `${rule.cssText}\n`;
+                });
+            }
         } catch (e) {
-            console.warn(
-                `Could not access CSS rules for ${stylesheet.href}: ${e}`
-            );
+            console.warn(`Could not access CSS for ${stylesheet.href || "inline styles"}: ${e}`);
         }
-    });
-
+    }
     return cssContent;
 }
 
-// Function to get all images and download them
-function getImages() {
-    return Array.from(document.querySelectorAll("img")).map((img, index) => {
-        return {
-            name: `image-${index + 1}.jpg`, // Set image filename
-            url: img.src,
-            alt: img.alt || "No alt text",
-            width: img.width,
-            height: img.height,
-        };
-    });
-}
-
-// Function to get all JavaScript URLs and inline scripts
-function getJavaScript() {
+// Function to get all JavaScript
+async function getAllJS() {
     let jsContent = "";
 
-    // Collect external scripts
-    Array.from(document.querySelectorAll("script[src]")).forEach(
-        (script, index) => {
-            jsContent += `External Script ${index + 1}: ${script.src}\n`;
+    // External JS
+    const scripts = Array.from(document.querySelectorAll("script[src]"));
+    for (const script of scripts) {
+        try {
+            const response = await fetch(script.src);
+            const text = await response.text();
+            jsContent += `/* Source: ${script.src} */\n${text}\n\n`;
+        } catch (e) {
+            console.warn(`Failed to fetch script: ${script.src}: ${e}`);
         }
-    );
+    }
 
-    // Collect inline scripts
-    Array.from(document.querySelectorAll("script:not([src])")).forEach(
-        (script, index) => {
-            jsContent += `Inline Script ${
-                index + 1
-            }:\n${script.textContent.trim()}\n\n`;
-        }
-    );
+    // Inline JS
+    const inlineScripts = Array.from(document.querySelectorAll("script:not([src])"));
+    inlineScripts.forEach((script, index) => {
+        jsContent += `/* Inline Script ${index + 1} */\n${script.textContent.trim()}\n\n`;
+    });
 
     return jsContent;
 }
 
-// Collect HTML, CSS, Images, and JavaScript
-const htmlContent = document.documentElement.outerHTML;
-const cssContent = getAllCSS();
-const imageContent = getImages();
-const jsContent = getJavaScript();
+// Function to get all images
+async function getImages() {
+    return Array.from(document.querySelectorAll("img")).map((img, index) => {
+        const url = img.src.startsWith("http")
+            ? img.src
+            : new URL(img.src, document.baseURI).href;
 
-console.log("Popup script running");
-// Event listeners for button clicks
-document.getElementById("downloadHTMLButton").addEventListener("click", () => {
-    console.log("Downloading HTML");
-    downloadFile("page.html", htmlContent, "text/html");
-});
-
-document.getElementById("downloadCSSButton").addEventListener("click", () => {
-    console.log("Downloading CSS");
-    const cssContent = getAllCSS();
-    downloadFile("styles.css", cssContent, "text/css");
-});
-
-document.getElementById("downloadJSButton").addEventListener("click", () => {
-    console.log("Downloading JS");
-    const jsContent = getJavaScript();
-    downloadFile("scripts.js", jsContent, "application/javascript");
-});
-
-document
-    .getElementById("downloadImagesButton")
-    .addEventListener("click", () => {
-        console.log("Downloading Images");
-        imageContent.forEach((img) => {
-            fetch(img.url)
-                .then((response) => response.blob())
-                .then((blob) => {
-                    downloadFile(img.name, blob, "image/jpeg");
-                })
-                .catch((err) =>
-                    console.warn(`Failed to fetch image: ${img.url}`, err)
-                );
-        });
+        return {
+            name: `image-${index + 1}.jpg`,
+            url: url,
+            alt: img.alt || "No alt text",
+        };
     });
-
-// Trigger download for HTML, CSS, and JS files
-// downloadFile("page.html", htmlContent, "text/html");
-// downloadFile("styles.css", cssContent, "text/css");
-// downloadFile("scripts.js", jsContent, "application/javascript");
-
-// Download images
-// imageContent.forEach((img) => {
-//     fetch(img.url)
-//       .then((response) => response.blob())
-//       .then((blob) => {
-//         downloadFile(img.name, blob, "image/jpeg");
-//       })
-//       .catch((err) => console.warn(`Failed to fetch image: ${img.url}`, err));
-// });
+}

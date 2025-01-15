@@ -3,31 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Download Files</title>
+  <title>Clone Element - InstantCSS</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 0;
+      padding: 16px;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    h1 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      text-align: center;
     }
     button {
-      background-color: #4CAF50;
-      color: white;
+      display: block;
+      width: 100%;
       padding: 10px;
-      font-size: 16px;
+      margin: 8px 0;
+      font-size: 14px;
+      background-color: #0078d7;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-      margin: 5px;
     }
     button:hover {
-      background-color: #45a049;
+      background-color: #005a9e;
+    }
+    button:active {
+      background-color: #003e6b;
     }
   </style>
 </head>
 <body>
-  <h3>Download HTML, CSS, JS, and Images</h3>
+  <h1>Clone Element - InstantCSS</h1>
   <button id="downloadHTMLButton">Download HTML</button>
   <button id="downloadCSSButton">Download CSS</button>
   <button id="downloadJSButton">Download JavaScript</button>
-  <button id="downloadImagesButton">Download Images(WIP)</button>
-  <script src="scrape.js"></script>
+  <button id="downloadImagesButton">Download Images</button>
+  <p style="font-size: 12px; text-align: center; margin-top: 16px;">
+    Extension by Janish Pancholi
+  </p>
+  <script src="popup.js"></script>
 </body>
 </html>
