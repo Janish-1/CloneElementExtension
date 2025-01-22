@@ -11,7 +11,7 @@ extensionAPI.runtime.onMessage.addListener((request, sender, sendResponse) => {
         getAllJS().then((jsContent) => sendResponse({ content: jsContent }));
         return true; // Keep the channel open for async response
     } else if (request.action === "downloadImages") {
-        getImages().then((images) => sendResponse({ images })); // Return image data
+        getImagesAndBackgrounds().then((images) => sendResponse({ images })); // Return image data
         return true; // Keep the channel open for async response
     }
 });
@@ -62,17 +62,45 @@ async function getAllJS() {
     return jsContent;
 }
 
-// Function to get all images
-async function getImages() {
-    return Array.from(document.querySelectorAll("img")).map((img, index) => {
+// Function to get all images, including background images
+async function getImagesAndBackgrounds() {
+    const images = Array.from(document.querySelectorAll("img")).map((img, index) => {
         const url = img.src.startsWith("http")
             ? img.src
             : new URL(img.src, document.baseURI).href;
 
         return {
+            type: "image",
             name: `image-${index + 1}.jpg`,
             url: url,
             alt: img.alt || "No alt text",
         };
     });
+
+    const backgroundImages = Array.from(document.querySelectorAll("*"))
+        .map((element, index) => {
+            const style = window.getComputedStyle(element);
+            const backgroundImage = style.getPropertyValue("background-image");
+
+            if (backgroundImage && backgroundImage !== "none") {
+                // Extract the URL from the CSS `background-image` property
+                const urlMatch = backgroundImage.match(/url\(["']?(.+?)["']?\)/);
+                if (urlMatch) {
+                    const url = urlMatch[1].startsWith("http")
+                        ? urlMatch[1]
+                        : new URL(urlMatch[1], document.baseURI).href;
+
+                    return {
+                        type: "background",
+                        name: `background-${index + 1}.jpg`,
+                        url: url,
+                        element: element.tagName.toLowerCase(), // Tag name for context
+                    };
+                }
+            }
+            return null;
+        })
+        .filter(Boolean); // Remove null entries
+
+    return [...images, ...backgroundImages];
 }
