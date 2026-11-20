@@ -16,6 +16,7 @@ document.getElementById("downloadImagesButton").addEventListener("click", () => 
 
 function sendMessageToContentScript(action) {
     const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
+    setStatus("Reading the current page…");
 
     extensionAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (extensionAPI.runtime.lastError) {
@@ -51,30 +52,33 @@ function sendMessageToContentScript(action) {
                     break;
             
                 case "downloadCSS":
-                    const cssBlob = new Blob([response.content], { type: "text/css" });
-                    const cssUrl = URL.createObjectURL(cssBlob);
-                    const cssAnchor = document.createElement("a");
-                    cssAnchor.href = cssUrl;
-                    cssAnchor.download = `${action}.css`;
-                    document.body.appendChild(cssAnchor);
-                    cssAnchor.click();
-                    document.body.removeChild(cssAnchor);
-                    URL.revokeObjectURL(cssUrl);
+                    if (typeof response.content !== "string") {
+                        reportError("The page stylesheets could not be collected.");
+                        return;
+                    }
+                    downloadFile(response.content, `${action}.css`, "text/css");
+                    setStatus("Stylesheet file downloaded.");
                     break;
             
                 case "downloadJS":
-                    const jsBlob = new Blob([response.content], { type: "application/javascript" });
-                    const jsUrl = URL.createObjectURL(jsBlob);
-                    const jsAnchor = document.createElement("a");
-                    jsAnchor.href = jsUrl;
-                    jsAnchor.download = `${action}.js`;
-                    document.body.appendChild(jsAnchor);
-                    jsAnchor.click();
-                    document.body.removeChild(jsAnchor);
-                    URL.revokeObjectURL(jsUrl);
+                    if (typeof response.content !== "string") {
+                        reportError("The page JavaScript could not be collected.");
+                        return;
+                    }
+                    downloadFile(response.content, `${action}.js`, "application/javascript");
+                    setStatus("JavaScript file downloaded.");
                     break;
 
                 case ('downloadImages'):
+                    if (!Array.isArray(response.images)) {
+                        reportError("The page images could not be collected.");
+                        return;
+                    }
+                    if (response.images.length === 0) {
+                        setStatus("No images were found on this page.");
+                        break;
+                    }
+                    setStatus(`Starting ${response.images.length} image downloads.`);
                     response.images.forEach((img) => {
                         fetch(img.url)
                             .then((res) => res.blob())

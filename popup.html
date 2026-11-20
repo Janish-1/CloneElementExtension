@@ -3,57 +3,301 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clone Element - InstantCSS</title>
+  <meta name="theme-color" content="#f5f7fb">
+  <title>PageSnap</title>
   <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: #172033;
+      background: #f5f7fb;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Arial, sans-serif;
+      width: 360px;
       margin: 0;
-      padding: 16px;
-      background-color: #f4f4f9;
-      color: #333;
+      padding: 20px;
+      background: #f5f7fb;
     }
-    h1 {
-      font-size: 18px;
-      margin-bottom: 16px;
-      text-align: center;
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
     }
-    button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      font-size: 14px;
-      background-color: #0078d7;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      border-radius: 13px;
     }
-    button:hover {
-      background-color: #005a9e;
+
+    .brand h1 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 720;
+      letter-spacing: -0.035em;
     }
-    button:active {
-      background-color: #003e6b;
-    }
-    #status {
-      min-height: 16px;
+
+    .brand p {
+      margin: 3px 0 0;
+      color: #69758b;
       font-size: 12px;
-      text-align: center;
     }
-    .box-width {
-      width: 300px;
+
+    .save-card {
+      padding: 15px;
+      border: 1px solid #e6eaf2;
+      border-radius: 17px;
+      background: #fff;
+      box-shadow: 0 5px 16px rgb(26 39 69 / 5%);
+    }
+
+    .eyebrow {
+      margin: 0 0 11px 2px;
+      color: #78849a;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .primary-button {
+      display: flex;
+      width: 100%;
+      min-height: 66px;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 12px;
+      background: linear-gradient(110deg, #5756e8, #7168f3);
+      color: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 140ms ease, box-shadow 140ms ease, filter 140ms ease;
+    }
+
+    .primary-button:hover {
+      filter: brightness(1.04);
+      box-shadow: 0 5px 13px rgb(87 86 232 / 25%);
+      transform: translateY(-1px);
+    }
+
+    .primary-button:active {
+      transform: translateY(0);
+    }
+
+    .primary-button:focus-visible,
+    .secondary-button:focus-visible,
+    summary:focus-visible {
+      outline: 3px solid #aaa8ff;
+      outline-offset: 3px;
+    }
+
+    .button-icon {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      place-items: center;
+      border-radius: 10px;
+      background: rgb(255 255 255 / 17%);
+    }
+
+    .button-icon svg,
+    .button-arrow {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.8;
+    }
+
+    .button-copy {
+      display: grid;
+      flex: 1;
+      gap: 3px;
+    }
+
+    .button-copy strong {
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .button-copy small {
+      color: rgb(255 255 255 / 78%);
+      font-size: 11px;
+    }
+
+    .status {
+      min-height: 16px;
+      margin: 10px 2px 0;
+      color: #4a5870;
+      font-size: 11px;
+      line-height: 1.45;
+    }
+
+    .downloads {
+      margin-top: 15px;
+      border-top: 1px solid #e7eaf1;
+    }
+
+    .downloads summary {
+      display: flex;
+      min-height: 44px;
+      align-items: center;
+      justify-content: space-between;
+      color: #46536a;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 620;
+      list-style: none;
+    }
+
+    .downloads summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .chevron {
+      width: 8px;
+      height: 8px;
+      margin-right: 3px;
+      border-right: 1.5px solid #7d8799;
+      border-bottom: 1.5px solid #7d8799;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform 140ms ease;
+    }
+
+    .downloads[open] .chevron {
+      transform: rotate(225deg) translate(-1px, -1px);
+    }
+
+    .download-options {
+      display: grid;
+      gap: 7px;
+      padding: 0 0 4px;
+    }
+
+    .secondary-button {
+      display: flex;
+      min-height: 40px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      border: 1px solid #e7eaf1;
+      border-radius: 10px;
+      background: #fff;
+      color: #3d4960;
+      cursor: pointer;
+      font-size: 12px;
+      text-align: left;
+      transition: background 120ms ease, border-color 120ms ease;
+    }
+
+    .secondary-button:hover {
+      border-color: #c9c8ff;
+      background: #f8f8ff;
+    }
+
+    .option-tag {
+      display: grid;
+      width: 28px;
+      height: 26px;
+      place-items: center;
+      border-radius: 7px;
+      background: #f0efff;
+      color: #5956d9;
+      font-size: 9px;
+      font-weight: 750;
+      letter-spacing: 0.02em;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 14px;
+      color: #8791a3;
+      font-size: 10px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="box-width">
-    <h1>Clone Element - InstantCSS</h1>
-    <button id="downloadHTMLButton">Download Page Snapshot</button>
-    <p id="status" role="status" aria-live="polite"></p>
-    <button id="downloadCSSButton">Download CSS</button>
-    <button id="downloadJSButton">Download JavaScript</button>
-    <button id="downloadImagesButton">Download Images</button>
-    <script src="popup.js"></script>
-  </div>
+  <header class="brand">
+    <img src="icons/logo.svg" alt="">
+    <div>
+      <h1>PageSnap</h1>
+      <p>Save the page you’re looking at</p>
+    </div>
+  </header>
+
+  <main class="save-card">
+    <p class="eyebrow">CURRENT TAB</p>
+    <button id="downloadHTMLButton" class="primary-button" type="button">
+      <span class="button-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3v11m0 0 4-4m-4 4-4-4"></path>
+          <path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"></path>
+        </svg>
+      </span>
+      <span class="button-copy">
+        <strong>Save page snapshot</strong>
+        <small>Download as an HTML file</small>
+      </span>
+      <svg class="button-arrow" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h14m-6-6 6 6-6 6"></path>
+      </svg>
+    </button>
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <details class="downloads">
+      <summary>
+        <span>More download options</span>
+        <span class="chevron" aria-hidden="true"></span>
+      </summary>
+      <div class="download-options">
+        <button id="downloadCSSButton" class="secondary-button" type="button">
+          <span class="option-tag" aria-hidden="true">CSS</span>
+          <span>Stylesheets</span>
+        </button>
+        <button id="downloadJSButton" class="secondary-button" type="button">
+          <span class="option-tag" aria-hidden="true">JS</span>
+          <span>JavaScript</span>
+        </button>
+        <button id="downloadImagesButton" class="secondary-button" type="button">
+          <span class="option-tag" aria-hidden="true">IMG</span>
+          <span>Images</span>
+        </button>
+      </div>
+    </details>
+  </main>
+
+  <footer>
+    <span>PageSnap · v4.3</span>
+    <span>Page resources stay linked</span>
+  </footer>
+  <script src="popup.js"></script>
 </body>
 </html>
