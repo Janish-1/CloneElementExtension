@@ -35,17 +35,25 @@
     button:active {
       background-color: #003e6b;
     }
+    #status {
+      min-height: 16px;
+      font-size: 12px;
+      text-align: center;
+    }
+    .box-width {
+      width: 300px;
+    }
   </style>
 </head>
 <body>
-  <h1>Clone Element - InstantCSS</h1>
-  <button id="downloadHTMLButton">Download HTML</button>
-  <button id="downloadCSSButton">Download CSS</button>
-  <button id="downloadJSButton">Download JavaScript</button>
-  <button id="downloadImagesButton">Download Images</button>
-  <p style="font-size: 12px; text-align: center; margin-top: 16px;">
-    Extension by Janish Pancholi
-  </p>
-  <script src="popup.js"></script>
+  <div class="box-width">
+    <h1>Clone Element - InstantCSS</h1>
+    <button id="downloadHTMLButton">Download Page Snapshot</button>
+    <p id="status" role="status" aria-live="polite"></p>
+    <button id="downloadCSSButton">Download CSS</button>
+    <button id="downloadJSButton">Download JavaScript</button>
+    <button id="downloadImagesButton">Download Images</button>
+    <script src="popup.js"></script>
+  </div>
 </body>
 </html>

@@ -18,23 +18,36 @@ function sendMessageToContentScript(action) {
     const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
     extensionAPI.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (extensionAPI.runtime.lastError) {
+            reportError(extensionAPI.runtime.lastError.message);
+            return;
+        }
+
+        if (!tabs[0]?.id) {
+            reportError("No active page is available.");
+            return;
+        }
+
         extensionAPI.tabs.sendMessage(tabs[0].id, { action }, (response) => {
+            if (extensionAPI.runtime.lastError) {
+                reportError("Could not read this page. Try a regular webpage.");
+                console.error(extensionAPI.runtime.lastError.message);
+                return;
+            }
+
             if (!response) {
-                console.error("No response from content script.");
+                reportError("The page did not return any content.");
                 return;
             }
 
             switch(action){
                 case "downloadHTML":
-                    const htmlBlob = new Blob([response.content], { type: "text/html" });
-                    const htmlUrl = URL.createObjectURL(htmlBlob);
-                    const htmlAnchor = document.createElement("a");
-                    htmlAnchor.href = htmlUrl;
-                    htmlAnchor.download = `${action}.html`;
-                    document.body.appendChild(htmlAnchor);
-                    htmlAnchor.click();
-                    document.body.removeChild(htmlAnchor);
-                    URL.revokeObjectURL(htmlUrl);
+                    if (typeof response.content !== "string") {
+                        reportError("The page snapshot could not be created.");
+                        return;
+                    }
+                    downloadFile(response.content, "page-snapshot.html", "text/html");
+                    setStatus("Page snapshot downloaded.");
                     break;
             
                 case "downloadCSS":
@@ -87,4 +100,25 @@ function sendMessageToContentScript(action) {
             }
         });
     });
+}
+
+function downloadFile(content, filename, contentType) {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function setStatus(message) {
+    document.getElementById("status").textContent = message;
+}
+
+function reportError(message) {
+    setStatus(message);
+    console.error(message);
 }

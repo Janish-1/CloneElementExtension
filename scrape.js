@@ -2,7 +2,17 @@ const extensionAPI = typeof browser !== "undefined" ? browser : chrome;
 
 extensionAPI.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "downloadHTML") {
-        const htmlContent = document.documentElement.outerHTML;
+        const page = document.documentElement.cloneNode(true);
+        const head = page.querySelector("head");
+        if (head) {
+            let base = head.querySelector("base");
+            if (!base) {
+                base = document.createElement("base");
+                head.prepend(base);
+            }
+            base.href = document.baseURI;
+        }
+        const htmlContent = `<!doctype html>\n${page.outerHTML}`;
         sendResponse({ content: htmlContent });
     } else if (request.action === "downloadCSS") {
         getAllCSS().then((cssContent) => sendResponse({ content: cssContent }));
